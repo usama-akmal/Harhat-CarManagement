@@ -145,7 +145,7 @@ function App() {
         <Row style={{ display: "flex" }} align="middle" justify="center">
           <div className="main-wallet-contract">
             <Space align="center">
-              <Button type="primary" onClick={connectMetamask}>
+              <Button type="primary" size="large" onClick={connectMetamask}>
                 Connect Wallet
               </Button>
               {/* <Button secondary onClick={connectContract}>
