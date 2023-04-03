@@ -89,9 +89,21 @@ function App() {
 
   const transferOwnership = async (carNumber, newOwner) => {
     await connectContract();
-    const transaction = await contract.transferOwnership(carNumber, newOwner);
-    const receipt = await transaction.wait();
-    console.log(receipt);
+    try {
+      const transaction = await contract.transferOwnership(carNumber, newOwner);
+      const receipt = await transaction.wait();
+      console.log(receipt);
+      api.success({
+        message: `Transfer Ownership Success!`,
+        placement: "top",
+      });
+    } catch (exc) {
+      api.error({
+        message: `Transfer Ownership Failed!`,
+        description: exc.error.message,
+        placement: "top",
+      });
+    }
   };
 
   const getContentComponent = (key) => {

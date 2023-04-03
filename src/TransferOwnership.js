@@ -31,6 +31,7 @@ const TransferOwnership = ({ execute }) => {
 
   const onFinish = async ({ carNumber, ownerAccount }) => {
     await execute(carNumber, ownerAccount);
+    onReset();
   };
 
   const onReset = () => {
