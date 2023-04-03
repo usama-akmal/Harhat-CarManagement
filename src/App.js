@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ethers } from "ethers";
-import { Layout, Menu, Space, Button, Row } from "antd";
+import { Layout, Menu, Space, Button, Row, notification } from "antd";
 import Search from "./Search";
 import NewRegistry from "./NewRegistry";
 import TransferOwnership from "./TransferOwnership";
@@ -9,6 +9,7 @@ import { CarManagementABI } from "./contractABIs";
 const { Header } = Layout;
 function App() {
   const [selectedKey, setSelectedKey] = useState(1);
+  const [api, contextHolder] = notification.useNotification();
 
   const menu = [
     {
@@ -61,6 +62,19 @@ function App() {
     await connectContract();
     const carDetails = await contract.retrieveCarDetails(carNumber);
     const owner = await contract.retrieveOwnerOfCar(carNumber);
+    if (owner === "0x0000000000000000000000000000000000000000") {
+      api.info({
+        message: `Search Completed`,
+        description: `Record not found for car number ${carNumber}`,
+        placement: "top",
+      });
+    } else {
+      api.success({
+        message: `Search Completed`,
+        description: `Record not found for car number ${carNumber}`,
+        placement: "top",
+      });
+    }
     return { ...carDetails, owner };
   };
 
@@ -82,6 +96,7 @@ function App() {
     <div className="App">
       {connected ? (
         <div>
+          {contextHolder}
           <Layout className="layout">
             <Header>
               <div className="logo" />

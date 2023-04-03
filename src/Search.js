@@ -22,23 +22,26 @@ const tailLayout = {
   wrapperCol: { offset: 0, span: 8 },
 };
 
-const Search = ({execute}) => {
+const Search = ({ execute }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const [form] = Form.useForm();
-
-  const [carDetails, setCarDetails] = useState(null);
+  const [hideCarDetails, setHideCarDetails] = useState(true);
+  const [carDetails, setCarDetails] = useState({});
 
   const onFinish = async ({ carNumber }) => {
     const data = await execute(carNumber);
     setCarDetails(data);
+    onReset();
+    setHideCarDetails(carDetails && !!carDetails.owner);
   };
 
   const onReset = () => {
     form.resetFields();
   };
+
   return (
     <Content style={{ padding: "0 50px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}>
@@ -69,7 +72,7 @@ const Search = ({execute}) => {
             </Space>
           </Form.Item>
         </Form>
-        {carDetails && (
+        {!hideCarDetails && (
           <div>
             <Title level={2}>Car Details Found</Title>
             <Space direction="vertical">
