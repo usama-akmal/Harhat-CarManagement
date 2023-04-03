@@ -35,7 +35,7 @@ const Search = ({ execute }) => {
     const data = await execute(carNumber);
     setCarDetails(data);
     onReset();
-    setHideCarDetails(carDetails && !!carDetails.owner);
+    setHideCarDetails(!data.number);
   };
 
   const onReset = () => {

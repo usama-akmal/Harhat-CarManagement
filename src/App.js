@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ethers } from "ethers";
-import { Layout, Menu, Space, Button, Row, notification } from "antd";
+import { Layout, Menu, Space, Button, Row, notification, Spin } from "antd";
 import Search from "./Search";
 import NewRegistry from "./NewRegistry";
 import TransferOwnership from "./TransferOwnership";
@@ -9,6 +9,7 @@ import { CarManagementABI } from "./contractABIs";
 const { Header } = Layout;
 function App() {
   const [selectedKey, setSelectedKey] = useState(1);
+  const [spinning, setSpinning] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
   const menu = [
@@ -49,6 +50,7 @@ function App() {
   };
 
   const createNewRegistry = async (data) => {
+    setSpinning(true);
     await connectContract();
     try {
       const transaction = await contract.storeCarDetails(data);
@@ -56,6 +58,7 @@ function App() {
       console.log(receipt);
       api.success({
         message: `Add New Registry Success!`,
+        description: `New registry of car "${data[0]}" is successfull!`,
         placement: "top",
       });
     } catch (exc) {
@@ -65,29 +68,33 @@ function App() {
         placement: "top",
       });
     }
+    setSpinning(false);
   };
 
   const searchCar = async (carNumber) => {
+    setSpinning(true);
     await connectContract();
     const carDetails = await contract.retrieveCarDetails(carNumber);
     const owner = await contract.retrieveOwnerOfCar(carNumber);
     if (owner === "0x0000000000000000000000000000000000000000") {
       api.info({
         message: `Search Completed`,
-        description: `Record not found for car number ${carNumber}`,
+        description: `Record not found for car number "${carNumber}"`,
         placement: "top",
       });
     } else {
       api.success({
         message: `Search Completed`,
-        description: `Record not found for car number ${carNumber}`,
+        description: `Record found for car number "${carNumber}"`,
         placement: "top",
       });
     }
+    setSpinning(false);
     return { ...carDetails, owner };
   };
 
   const transferOwnership = async (carNumber, newOwner) => {
+    setSpinning(true);
     await connectContract();
     try {
       const transaction = await contract.transferOwnership(carNumber, newOwner);
@@ -95,6 +102,7 @@ function App() {
       console.log(receipt);
       api.success({
         message: `Transfer Ownership Success!`,
+        description: `Transfered ownership of car "${carNumber}" to "${newOwner}"`,
         placement: "top",
       });
     } catch (exc) {
@@ -104,6 +112,7 @@ function App() {
         placement: "top",
       });
     }
+    setSpinning(false);
   };
 
   const getContentComponent = (key) => {
@@ -116,7 +125,7 @@ function App() {
   return (
     <div className="App">
       {!!account ? (
-        <div>
+        <Spin spinning={spinning}>
           {contextHolder}
           <Layout className="layout">
             <Header>
@@ -131,7 +140,7 @@ function App() {
             </Header>
           </Layout>
           {getContentComponent(selectedKey)}
-        </div>
+        </Spin>
       ) : (
         <Row style={{ display: "flex" }} align="middle" justify="center">
           <div className="main-wallet-contract">
