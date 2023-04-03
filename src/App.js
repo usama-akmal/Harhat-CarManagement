@@ -28,7 +28,6 @@ function App() {
 
   const { ethereum } = window;
   let [account, setAccount] = useState("");
-  const [connected, setConnected] = useState(false);
 
   const connectMetamask = async () => {
     if (window.ethereum !== "undefined") {
@@ -36,7 +35,6 @@ function App() {
         method: "eth_requestAccounts",
       });
       setAccount(accounts[0]);
-      setConnected(account && !!contract);
     }
   };
 
@@ -48,7 +46,6 @@ function App() {
     const signer = provider.getSigner();
     contract = new ethers.Contract(Address, ABI, signer);
     console.log(contract.address);
-    setConnected(account && !!contract);
   };
 
   const createNewRegistry = async (data) => {
@@ -106,7 +103,7 @@ function App() {
 
   return (
     <div className="App">
-      {connected ? (
+      {!!account ? (
         <div>
           {contextHolder}
           <Layout className="layout">
@@ -130,9 +127,9 @@ function App() {
               <Button type="primary" onClick={connectMetamask}>
                 Connect Wallet
               </Button>
-              <Button secondary onClick={connectContract}>
+              {/* <Button secondary onClick={connectContract}>
                 Connect Contract
-              </Button>
+              </Button> */}
             </Space>
           </div>
         </Row>
