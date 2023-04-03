@@ -21,15 +21,15 @@ const tailLayout = {
   wrapperCol: { offset: 0, span: 8 },
 };
 
-const NewRegistry = () => {
+const NewRegistry = ({ execute }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log(values);
+  const onFinish = async ({ carNumber, carColor, carModel }) => {
+    await execute([carNumber, carColor, carModel]);
   };
 
   const onReset = () => {

@@ -22,15 +22,15 @@ const tailLayout = {
 
 const { Content } = Layout;
 
-const TransferOwnership = () => {
+const TransferOwnership = ({ execute }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log(values);
+  const onFinish = async ({ carNumber, ownerAccount }) => {
+    await execute(carNumber, ownerAccount);
   };
 
   const onReset = () => {

@@ -22,7 +22,7 @@ const tailLayout = {
   wrapperCol: { offset: 0, span: 8 },
 };
 
-const Search = () => {
+const Search = ({execute}) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -31,8 +31,9 @@ const Search = () => {
 
   const [carDetails, setCarDetails] = useState(null);
 
-  const onFinish = (values) => {
-    console.log(values);
+  const onFinish = async ({ carNumber }) => {
+    const data = await execute(carNumber);
+    setCarDetails(data);
   };
 
   const onReset = () => {
@@ -73,16 +74,16 @@ const Search = () => {
             <Title level={2}>Car Details Found</Title>
             <Space direction="vertical">
               <Text>
-                Car Number: <Text keyboard>ABC-123</Text>
+                Car Number: <Text keyboard>{carDetails.number}</Text>
               </Text>
               <Text>
-                Car Color: <Text italic>0xd</Text>
+                Car Color: <Text italic>{carDetails.color}</Text>
               </Text>
               <Text>
-                Car Model: <Text italic>0xd</Text>
+                Car Model: <Text italic>{carDetails.model}</Text>
               </Text>
               <Text>
-                Car Owner: <Text code>0xd</Text>{" "}
+                Car Owner: <Text code>{carDetails.owner}</Text>
               </Text>
             </Space>
           </div>

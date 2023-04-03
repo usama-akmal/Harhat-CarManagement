@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { ethers } from "ethers";
 import { Layout, Menu, Space, Button, Row } from "antd";
 import Search from "./Search";
 import NewRegistry from "./NewRegistry";
 import TransferOwnership from "./TransferOwnership";
-import { AppContext } from "./context/AppContext";
+import { CarManagementABI } from "./contractABIs";
 
 const { Header } = Layout;
 function App() {
@@ -26,32 +27,61 @@ function App() {
 
   const { ethereum } = window;
   let [account, setAccount] = useState("");
-  let [contractData, setContractData] = useState("");
+  const [connected, setConnected] = useState(false);
 
   const connectMetamask = async () => {
-    return;
+    if (window.ethereum !== "undefined") {
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setAccount(accounts[0]);
+      setConnected(account && !!contract);
+    }
   };
 
+  let contract;
   const connectContract = async () => {
-    return;
+    const Address = "0x2F5E6ca839D63797753577bEB14599C8bE8c60f1";
+    const ABI = CarManagementABI;
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    contract = new ethers.Contract(Address, ABI, signer);
+    console.log(contract.address);
+    setConnected(account && !!contract);
   };
-  const getData = async () => {
-    return;
+
+  const createNewRegistry = async (data) => {
+    await connectContract();
+    const transaction = await contract.storeCarDetails(data);
+    const receipt = await transaction.wait();
+    console.log(receipt);
   };
-  const changeData = async () => {
-    return;
+
+  const searchCar = async (carNumber) => {
+    await connectContract();
+    const carDetails = await contract.retrieveCarDetails(carNumber);
+    const owner = await contract.retrieveOwnerOfCar(carNumber);
+    return { ...carDetails, owner };
   };
+
+  const transferOwnership = async (carNumber, newOwner) => {
+    await connectContract();
+    const transaction = await contract.transferOwnership(carNumber, newOwner);
+    const receipt = await transaction.wait();
+    console.log(receipt);
+  };
+
+  const getContentComponent = (key) => {
+    if (key === "1") return <Search execute={searchCar} />;
+    if (key === "2") return <NewRegistry execute={createNewRegistry} />;
+    if (key === "3") return <TransferOwnership execute={transferOwnership} />;
+    return <Search execute={searchCar} />;
+  };
+
   return (
     <div className="App">
-      {/* <button onClick={connectMetamask}>CONNECT TO METAMASK</button>
-      <p>{account}</p>
-      <button onClick={connectContract}>CONNECT TO CONTRACT</button>
-      <button onClick={changeData}>CHANGE DATA</button>
-      <button onClick={getData}>READ FROM CONTRACT</button>
-      <p>{contractData}</p> */}
-
-      {account ? (
-        <AppContext.Provider value={{ account }}>
+      {connected ? (
+        <div>
           <Layout className="layout">
             <Header>
               <div className="logo" />
@@ -65,13 +95,17 @@ function App() {
             </Header>
           </Layout>
           {getContentComponent(selectedKey)}
-        </AppContext.Provider>
+        </div>
       ) : (
         <Row style={{ display: "flex" }} align="middle" justify="center">
           <div className="main-wallet-contract">
             <Space align="center">
-              <Button type="primary">Connect Wallet</Button>
-              <Button secondary>Connect Contract</Button>
+              <Button type="primary" onClick={connectMetamask}>
+                Connect Wallet
+              </Button>
+              <Button secondary onClick={connectContract}>
+                Connect Contract
+              </Button>
             </Space>
           </div>
         </Row>
@@ -80,10 +114,4 @@ function App() {
   );
 }
 
-const getContentComponent = (key) => {
-  if (key === "1") return <Search />;
-  if (key === "2") return <NewRegistry />;
-  if (key === "3") return <TransferOwnership />;
-  return <Search />;
-};
 export default App;
