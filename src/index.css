@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+}
+
+.main-wallet-contract {
+  position: relative;
+  transform: translate(0%, 50%);
+  height: 100vh;
+}
