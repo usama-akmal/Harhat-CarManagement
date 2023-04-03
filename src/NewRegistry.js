@@ -30,6 +30,7 @@ const NewRegistry = ({ execute }) => {
 
   const onFinish = async ({ carNumber, carColor, carModel }) => {
     await execute([carNumber, carColor, carModel]);
+    onReset();
   };
 
   const onReset = () => {

@@ -53,9 +53,21 @@ function App() {
 
   const createNewRegistry = async (data) => {
     await connectContract();
-    const transaction = await contract.storeCarDetails(data);
-    const receipt = await transaction.wait();
-    console.log(receipt);
+    try {
+      const transaction = await contract.storeCarDetails(data);
+      const receipt = await transaction.wait();
+      console.log(receipt);
+      api.success({
+        message: `Add New Registry Success!`,
+        placement: "top",
+      });
+    } catch (exc) {
+      api.error({
+        message: `Add New Registry Failed!`,
+        description: exc.error.message,
+        placement: "top",
+      });
+    }
   };
 
   const searchCar = async (carNumber) => {
